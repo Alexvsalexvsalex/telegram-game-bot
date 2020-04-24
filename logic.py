@@ -43,6 +43,8 @@ class Tournament(object):
         random.shuffle(self.participiants)
         for i in range(1, partCnt + 1):
             self.heap[partCnt - i] = self.participiants[i - 1]
+        for i in range(len(self.heap)):
+            print(self.heap[i])
 
     def getCurrentMatch(self):
         return Match(self.heap.pop(), self.heap.pop())
