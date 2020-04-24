@@ -3,19 +3,19 @@ from telegram.ext import Updater, CommandHandler
 users = []
 
 
-def start(update, context):
+def start(bot, update):
     update.message.reply_text('Я ни че не умею, отстань')
 
 
-def register(update, context):
+def register(bot, update):
     users.append(update.message.from_user.username)
 
 
-def remove(update, context):
+def remove(bot, update):
     users.remove(update.message.from_user.username)
 
 
-def status(update, context):
+def status(bot, update):
     update.message.reply_text(users)
 
 
@@ -25,7 +25,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 if __name__ == "__main__":
-    updater = Updater('1268400370:AAHHFMgsiN5n3PqUwjUbBRVtC4kNfl5MSTk', use_context=True)
+    updater = Updater('1268400370:AAHHFMgsiN5n3PqUwjUbBRVtC4kNfl5MSTk')
     dp = updater.dispatcher
 
     # public handlers
