@@ -38,7 +38,7 @@ class Tournament(object):
             self.heap.append(None)
             self.heap.append(None)
             leaf = leaf + 1
-        random.shuffle(self.participiants)
+        random.shuffle(partLst)
         for i in range(1, partCnt + 1):
             self.heap[len(self.heap) - i] = partLst[i - 1]
         for i in range(len(self.heap)):
