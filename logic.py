@@ -25,24 +25,22 @@ class Tournament(object):
 
     def __init__(self):
         self.heap = [None]
-        self.participiants = []
+        self.participiants = set()
 
     def register(self, player):
-        self.participiants.append(player)
-
-    def getAdmin(self):
-        return self.participiants[0]
+        self.participiants.add(player)
 
     def start(self):
         leaf = 1
         partCnt = len(self.participiants)
+        partLst = list(self.participiants)
         while leaf < partCnt:
             self.heap.append(None)
             self.heap.append(None)
             leaf = leaf + 1
         random.shuffle(self.participiants)
         for i in range(1, partCnt + 1):
-            self.heap[partCnt - i] = self.participiants[i - 1]
+            self.heap[len(self.heap) - i] = partLst[i - 1]
         for i in range(len(self.heap)):
             print(self.heap[i])
 
