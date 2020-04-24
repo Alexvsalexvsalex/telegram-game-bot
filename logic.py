@@ -1,7 +1,7 @@
 import random
 
 
-class Math(object):
+class Match(object):
 
     def __init__(self, firstPlayer, secondPlayer):
         self.first = firstPlayer
@@ -42,10 +42,10 @@ class Tournament(object):
             leaf = leaf + 1
         random.shuffle(self.participiants)
         for i in range(1, partCnt + 1):
-            self.heap[partCnt - i] = self.participiants[i]
+            self.heap[partCnt - i] = self.participiants[i - 1]
 
     def getCurrentMath(self):
-        return Math(self.heap.pop(), self.heap.pop())
+        return Match(self.heap.pop(), self.heap.pop())
 
     def receiveMathWinner(self, match):
         self.heap[(len(self.heap) - 1) / 2 + 1] = match.getWinner()
