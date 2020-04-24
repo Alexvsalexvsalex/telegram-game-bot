@@ -42,7 +42,7 @@ class Tournament(object):
             leaf = leaf + 1
         random.shuffle(self.participiants)
         for i in range(1, partCnt + 1):
-            self.heap[partCnt - i] = self.participiants[i]
+            self.heap[partCnt - i] = self.participiants[i - 1]
 
     def getCurrentMath(self):
         return Match(self.heap.pop(), self.heap.pop())
