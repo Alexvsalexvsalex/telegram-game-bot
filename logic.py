@@ -26,6 +26,7 @@ class Tournament(object):
     def __init__(self):
         self.heap = [None]
         self.participiants = set()
+        self.isStartedFlag = False
 
     def register(self, player):
         self.participiants.add(player)
@@ -36,11 +37,10 @@ class Tournament(object):
         return False
 
     def isStarted(self):
-        if len(self.heap) > 1:
-            return True
-        return False
+        return self.isStartedFlag
 
     def start(self):
+        self.isStartedFlag = True
         leaf = 1
         partCnt = len(self.participiants)
         partLst = list(self.participiants)
