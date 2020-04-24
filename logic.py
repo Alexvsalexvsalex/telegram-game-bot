@@ -44,10 +44,10 @@ class Tournament(object):
         for i in range(1, partCnt + 1):
             self.heap[partCnt - i] = self.participiants[i - 1]
 
-    def getCurrentMath(self):
+    def getCurrentMatch(self):
         return Match(self.heap.pop(), self.heap.pop())
 
-    def receiveMathWinner(self, match):
+    def receiveMatchWinner(self, match):
         self.heap[(len(self.heap) - 1) / 2 + 1] = match.getWinner()
 
     def isFinished(self):
