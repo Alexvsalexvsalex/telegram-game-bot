@@ -30,6 +30,16 @@ class Tournament(object):
     def register(self, player):
         self.participiants.add(player)
 
+    def canBeStarted(self):
+        if len(self.participiants) > 1:
+            return True
+        return False
+
+    def isStarted(self):
+        if len(self.heap) > 1:
+            return True
+        return False
+
     def start(self):
         leaf = 1
         partCnt = len(self.participiants)
@@ -56,9 +66,3 @@ class Tournament(object):
 
     def getWinner(self):
         return self.heap[0]
-
-# _, _, _, A, B, C, D
-# _, _, _, A, B
-#        5
-# _, _, C or D, A, B
-#        2
