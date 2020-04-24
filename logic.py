@@ -41,19 +41,24 @@ class Tournament(object):
         random.shuffle(partLst)
         for i in range(1, partCnt + 1):
             self.heap[len(self.heap) - i] = partLst[i - 1]
-        for i in range(len(self.heap)):
-            print(self.heap[i])
+        print(self.heap)
 
     def getCurrentMatch(self):
         return Match(self.heap.pop(), self.heap.pop())
 
     def receiveMatchWinner(self, match):
-        self.heap[(len(self.heap) - 1) / 2 + 1] = match.getWinner()
+        self.heap[(len(self.heap) - 2) // 2 + 1] = match.getWinner()
 
     def isFinished(self):
-        if len(self.heap == 1):
+        if len(self.heap) == 1:
             return True
         return False
 
     def getWinner(self):
         return self.heap[0]
+
+# _, _, _, A, B, C, D
+# _, _, _, A, B
+#        5
+# _, _, C or D, A, B
+#        2

@@ -43,13 +43,13 @@ def nextMatch(bot, update):
 def sendWinner(bot, update, args):
     global currentMatch
     global currentTournament
-    if args.length != 1:
+    if len(args) != 1:
         update.message.reply_text('Нужен только username победителя')
     else:
         if currentMatch is None:
             update.message.reply_text('Матч не начат')
         else:
-            if currentMatch is None or args[0] != currentMatch.getFirstPlayer() or args[0] != currentMatch.getSecondPlayer():
+            if currentMatch is None or (args[0] != currentMatch.getFirstPlayer() and args[0] != currentMatch.getSecondPlayer()):
                 update.message.reply_text('Не знаем такого')
             else:
                 currentMatch.setWinner(args[0])
@@ -62,7 +62,7 @@ def checkTournamentEnd(update):
     global currentMatch
     global currentTournament
     if currentTournament.isFinished():
-        update.message.reply_text('Иии... Победитель: ' + currentTournament.getWinner())
+        update.message.reply_text('Победитель турнира: ' + currentTournament.getWinner())
     else:
         update.message.reply_text('Продолжаем турнир')
 
