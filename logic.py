@@ -83,7 +83,7 @@ class Tournament(object):
         return self.currentMatch
 
     def isFinished(self):
-        if len(self.heap) == 1:
+        if len(self.heap) == 1 and self.heap[0] is not None:
             return True
         return False
 
