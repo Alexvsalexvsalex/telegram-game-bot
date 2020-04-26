@@ -41,14 +41,14 @@ def register(bot, update):
         update.message.reply_text('Турнир идёт')
 
 
-def participiants(bot, update):
+def participants(bot, update):
     global currentTournament
-    partLst = currentTournament.getParticipiants()
+    partLst = currentTournament.getParticipants()
     if len(partLst) == 0:
         update.message.reply_text("Нет зарегистрировашихся")
     else:
         message = "Список зарегистрировашихся: "
-        for u in currentTournament.getParticipiants():
+        for u in partLst:
             message += u + ' '
         update.message.reply_text(message)
 
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     dp.add_handler(CommandHandler('test', test))
     dp.add_handler(CommandHandler('start_tournament', startTournament))
     dp.add_handler(CommandHandler('register', register))
-    dp.add_handler(CommandHandler('participiants', participiants))
+    dp.add_handler(CommandHandler('participants', participants))
     dp.add_handler(CommandHandler('reset', reset))
     dp.add_handler(CommandHandler('next_match', nextMatch))
     dp.add_handler(CommandHandler('i_am_the_winner', iAmTheWinner))
