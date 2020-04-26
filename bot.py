@@ -55,7 +55,8 @@ def participiants(bot, update):
 
 def dice(bot, update):
     global currentTournament
-    update.message.reply_dice()
+    m = update.message.reply_dice()
+    update.message.reply_text(m.dice().value)
 
 
 def nextMatch(bot, update):
