@@ -31,6 +31,9 @@ class Tournament(object):
     def register(self, player):
         self.participiants.add(player)
 
+    def getParticipiants(self):
+        return list(self.participiants)
+
     def canBeStarted(self):
         if len(self.participiants) > 1:
             return True
