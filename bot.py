@@ -4,25 +4,37 @@ import time
 
 
 currentTournament = Tournament()
+current_emoji = ":dice"
+
+
+def hard_reset(bot, chat_id):
+    global currentTournament
+    currentTournament = Tournament()
+    bot.sendMessage(chat_id, 'Турнир завершен, открывается регистрация на новый')
 
 
 def reset(bot, update):
-    global currentTournament
-    currentTournament = Tournament()
-    update.message.reply_text('Турнир завершен, открывается регистрация на новый')
+    hard_reset(bot, update.message.chat.id)
 
 
 def test(bot, update):
     update.message.reply_text('Проверка связи')
 
 
-def start_tournament(bot, update):
+def start_tournament(bot, update, args):
     global currentTournament
+    global current_emoji
     if currentTournament.isStarted():
         update.message.reply_text('Турнир идёт')
     elif currentTournament.canBeStarted():
+        if len(args) == 1 and args[0] == "dart":
+            current_emoji = ":dart"  # Here dart emoji
+        else:
+            current_emoji = ":dice"  # Here dice emoji
         currentTournament.start()
-        update.message.reply_text('Турнир начался')
+        chat_id = update.message.chat.id
+        bot.sendMessage(chat_id, 'Турнир начался')
+        next_match(bot, chat_id)
     else:
         update.message.reply_text('Турнир не может быть начат, минимум 2 участника')
 
@@ -38,58 +50,57 @@ def register(bot, update):
 
 def participants(bot, update):
     global currentTournament
-    partLst = currentTournament.getParticipants()
-    if len(partLst) == 0:
+    part_list = currentTournament.getParticipants()
+    if len(part_list) == 0:
         update.message.reply_text("Нет зарегистрировашихся")
     else:
         message = "Список зарегистрировашихся: "
-        for u in partLst:
+        for u in part_list:
             message += u + ' '
         update.message.reply_text(message)
 
 
-def dice(bot, update):
+def throw(bot, update):
     global currentTournament
-    user = update.message.from_user.username
-    chat_id = update.message.chat.id
-    if currentTournament.getCurrentMatch().canBeChanged(user):
-        number_on_dice = update.message.reply_dice().dice.value
-        result = currentTournament.getCurrentMatch().setResult(user, number_on_dice)
-        if result is not None:
-            time.sleep(3)
-            if result == "!":
-                bot.sendMessage(chat_id, "Ого, похоже на ничью, переигровка!")
-            else:
-                bot.sendMessage(chat_id, "Побеждает @" + result)
-            next_match(bot, chat_id)
+    global current_emoji
+    if currentTournament.isStarted():
+        user = update.message.from_user.username
+        chat_id = update.message.chat.id
+        if currentTournament.getCurrentMatch().canBeChanged(user):
+            number_on_dice = update.message.reply_dice(emoji = current_emoji).dice.value
+            result = currentTournament.getCurrentMatch().setResult(user, number_on_dice)
+            if result is not None:
+                time.sleep(4)
+                if result == "!":
+                    bot.sendMessage(chat_id, "Ого, похоже на ничью, переигровка!")
+                else:
+                    bot.sendMessage(chat_id, "Побеждает @" + result)
+                    next_match(bot, chat_id)
+        else:
+            update.message.reply_text("Эм, но вы не участвуете в текущем матче, либо уже сделали ход")
     else:
-        update.message.reply_text("Эм, но вы не участвуете в текущем матче, либо уже бросили кубик")
+        update.message.reply_text("Турнир еще не начался")
 
 
 def next_match(bot, chat_id):
     global currentTournament
-    if not check_tournament_end(bot, chat_id):
+    if not currentTournament.isFinished():
         players = currentTournament.getCurrentMatch().getPlayers()
         bot.sendMessage(chat_id, 'Матч между @' + players[0] + ' и @' + players[1])
-
-
-def check_tournament_end(bot, chat_id):
-    global currentTournament
-    if currentTournament.isFinished():
-        bot.sendMessage(chat_id, 'Победитель турнира: @' + currentTournament.getWinner())
-        reset(bot, chat_id)
     else:
-        bot.sendMessage(chat_id, 'Продолжаем турнир')
+        bot.sendMessage(chat_id, 'Победитель турнира: @' + currentTournament.getWinner())
+        hard_reset(bot, chat_id)
 
 
 def my_help(bot, update):
-    update.message.reply_text('Инструкция:\n'
-                              '1) Для участия в турнире необходимо зарегистрироваться. Для этого воспользуйтесь командой /register\n'
-                              '2) Турнир начинается командой /start_tournament . Регистрация после этого закрывается.\n'
-                              '3) Чтобы провести матч необходимо выполнить команду /next_match. Будут определены участники матча\n'
-                              '4) После проведения матча нужно сообщить победителя командой /send_winner с тэгом победителя. Сообщает сам победитель.\n'
-                              '5) В форс-мажорных ситуациях можно сбросить текущий туринир командой /reset.\n'
-                              '6) Также можно проверить работоспособность бота командой /test\n')
+    update.message.reply_text(
+        '1) Для участия в турнире необходимо зарегистрироваться. Для этого воспользуйтесь командой /register. \n'
+        '2) Можно узнать список участников, вызвав команду /participants. \n'
+        '3) Турнир начинается командой /start_tournament. Регистрация после этого закрывается.\n'
+        '4) Можно указать вид состязания, указав соответствующий эмоджи в команде /start_tournament. По умолчанию это кости. (В разработке) \n'
+        '5) В начале матча будут объявлены игроки. Чтобы сделать ход воспользуйтесь командой /throw. \n'
+        '6) В форс-мажорных ситуациях можно сбросить текущий туринир командой /reset.\n'
+        '7) Также можно проверить работоспособность бота командой /test. \n')
 
 
 import logging
@@ -103,11 +114,11 @@ if __name__ == "__main__":
 
     # public handlers
     dp.add_handler(CommandHandler('test', test))
-    dp.add_handler(CommandHandler('start_tournament', start_tournament))
+    dp.add_handler(CommandHandler('start_tournament', start_tournament, pass_args=True))
     dp.add_handler(CommandHandler('register', register))
     dp.add_handler(CommandHandler('participants', participants))
     dp.add_handler(CommandHandler('reset', reset))
-    dp.add_handler(CommandHandler('dice', dice))
+    dp.add_handler(CommandHandler('throw', throw))
     dp.add_handler(CommandHandler('help', my_help))
 
     updater.start_polling()
