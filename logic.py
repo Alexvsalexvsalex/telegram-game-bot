@@ -78,15 +78,21 @@ class Tournament(object):
     def generateNextMatch(self):
         self.currentMatch = Match(self.heap.pop(), self.heap.pop())
 
+    def setWinnerOfLastMatch(self):
+        self.heap[(len(self.heap) - 2) // 2 + 1] = self.currentMatch.getWinner()
+
     def getCurrentMatch(self):
         if self.currentMatch.getWinner() is not None:
-            self.heap[(len(self.heap) - 2) // 2 + 1] = self.currentMatch.getWinner()
-            self.generateNextMatch()
+            self.setWinnerOfLastMatch()
+            if not self.isFinished():
+                self.generateNextMatch()
         return self.currentMatch
 
     def isFinished(self):
-        if len(self.heap) == 1 and self.heap[0] is not None:
-            return True
+        if len(self.heap) == 1:
+            if self.currentMatch.getWinner() is not None:
+                self.setWinnerOfLastMatch()
+                return True
         return False
 
     def getWinner(self):
