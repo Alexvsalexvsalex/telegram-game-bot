@@ -10,6 +10,7 @@ def reset(bot, update):
     global currentTournament
     currentTournament = Tournament()
     currentMatch = None
+    update.message.reply_text('Турнир сброшен')
 
 
 def test(bot, update):
@@ -38,6 +39,18 @@ def register(bot, update):
         update.message.reply_text('Успешная регистрация на этот замечательный турнир')
     else:
         update.message.reply_text('Турнир идёт')
+
+
+def participiants(bot, update):
+    global currentTournament
+    partLst = currentTournament.getParticipiants()
+    if len(partLst) == 0:
+        update.message.reply_text("Нет зарегистрировашихся")
+    else:
+        message = "Список зарегистрировашихся: "
+        for u in currentTournament.getParticipiants():
+            message += u + ' '
+        update.message.reply_text(message)
 
 
 def nextMatch(bot, update):
@@ -100,6 +113,8 @@ def checkTournamentEnd(update):
     global currentTournament
     if currentTournament.isFinished():
         update.message.reply_text('Победитель турнира: @' + currentTournament.getWinner())
+        currentTournament = Tournament()
+        currentMatch = None
     else:
         update.message.reply_text('Продолжаем турнир')
 
@@ -127,6 +142,7 @@ if __name__ == "__main__":
     dp.add_handler(CommandHandler('test', test))
     dp.add_handler(CommandHandler('start_tournament', startTournament))
     dp.add_handler(CommandHandler('register', register))
+    dp.add_handler(CommandHandler('participiants', participiants))
     dp.add_handler(CommandHandler('reset', reset))
     dp.add_handler(CommandHandler('next_match', nextMatch))
     dp.add_handler(CommandHandler('i_am_the_winner', iAmTheWinner))
