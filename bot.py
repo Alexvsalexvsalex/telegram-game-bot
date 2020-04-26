@@ -53,6 +53,11 @@ def participiants(bot, update):
         update.message.reply_text(message)
 
 
+def dice(bot, update):
+    global currentTournament
+    update.message.reply_dice()
+
+
 def nextMatch(bot, update):
     global currentMatch
     global currentTournament
@@ -146,6 +151,7 @@ if __name__ == "__main__":
     dp.add_handler(CommandHandler('reset', reset))
     dp.add_handler(CommandHandler('next_match', nextMatch))
     dp.add_handler(CommandHandler('i_am_the_winner', iAmTheWinner))
+    dp.add_handler(CommandHandler('dice', dice))
     dp.add_handler(CommandHandler('send_winner', sendWinner, pass_args=True))
     dp.add_handler(CommandHandler('help', myHelp))
 
