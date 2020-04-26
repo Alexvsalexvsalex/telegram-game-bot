@@ -1,26 +1,22 @@
 from telegram.ext import Updater, CommandHandler
 from logic import Match, Tournament
+import time
+
 
 currentTournament = Tournament()
-currentMatch = None
 
 
 def reset(bot, update):
-    global currentMatch
     global currentTournament
     currentTournament = Tournament()
-    currentMatch = None
-    update.message.reply_text('Турнир сброшен')
+    update.message.reply_text('Турнир завершен, открывается регистрация на новый')
 
 
 def test(bot, update):
-    global currentMatch
-    global currentTournamen
     update.message.reply_text('Проверка связи')
 
 
-def startTournament(bot, update):
-    global currentMatch
+def start_tournament(bot, update):
     global currentTournament
     if currentTournament.isStarted():
         update.message.reply_text('Турнир идёт')
@@ -32,7 +28,6 @@ def startTournament(bot, update):
 
 
 def register(bot, update):
-    global currentMatch
     global currentTournament
     if not currentTournament.isStarted():
         currentTournament.register(update.message.from_user.username)
@@ -55,77 +50,39 @@ def participants(bot, update):
 
 def dice(bot, update):
     global currentTournament
-    m = update.message.reply_dice()
-    update.message.reply_text(m.dice().value)
-
-
-def nextMatch(bot, update):
-    global currentMatch
-    global currentTournament
-    if currentTournament.isStarted():
-        if currentMatch is not None:
-            update.message.reply_text('Есть активный матч')
-        else:
-            currentMatch = currentTournament.getCurrentMatch()
-            update.message.reply_text('Матч между @' + currentMatch.getFirstPlayer() + ' и @' + currentMatch.getSecondPlayer())
-    else:
-        update.message.reply_text('В данное время турнир не проводится')
-
-
-def sendWinner(bot, update, args):
-    global currentMatch
-    global currentTournament
-    if not currentTournament.isStarted():
-        update.message.reply_text('В данное время турнир не проводится')
-    else:
-        if len(args) != 1:
-            update.message.reply_text('Нужен только username победителя')
-        else:
-            if currentMatch is None:
-                update.message.reply_text('Матч не начат')
+    user = update.message.from_user.username
+    chat_id = update.message.chat.id
+    if currentTournament.getCurrentMatch().canBeChanged(user):
+        number_on_dice = update.message.reply_dice().dice.value
+        result = currentTournament.getCurrentMatch().setResult(user, number_on_dice)
+        if result is not None:
+            time.sleep(3)
+            if result == "!":
+                bot.sendMessage(chat_id, "Ого, похоже на ничью, переигровка!")
             else:
-                if currentMatch is None or (
-                        args[0] != currentMatch.getFirstPlayer() and args[0] != currentMatch.getSecondPlayer()):
-                    update.message.reply_text('Не знаем такого')
-                else:
-                    currentMatch.setWinner(args[0])
-                    currentTournament.receiveMatchWinner(currentMatch)
-                    currentMatch = None
-                    checkTournamentEnd(update)
-
-
-def iAmTheWinner(bot, update):
-    global currentMatch
-    global currentTournament
-    if not currentTournament.isStarted():
-        update.message.reply_text('В данное время турнир не проводится')
+                bot.sendMessage(chat_id, "Побеждает @" + result)
+            next_match(bot, chat_id)
     else:
-            if currentMatch is None:
-                update.message.reply_text('Матч не начат')
-            else:
-                if currentMatch is None or (
-                        update.message.from_user.username != currentMatch.getFirstPlayer() and
-                        update.message.from_user.username != currentMatch.getSecondPlayer()):
-                    update.message.reply_text('Не знаем такого')
-                else:
-                    currentMatch.setWinner(update.message.from_user.username)
-                    currentTournament.receiveMatchWinner(currentMatch)
-                    currentMatch = None
-                    checkTournamentEnd(update)
+        update.message.reply_text("Эм, но вы не участвуете в текущем матче, либо уже бросили кубик")
 
 
-def checkTournamentEnd(update):
-    global currentMatch
+def next_match(bot, chat_id):
+    global currentTournament
+    if not check_tournament_end(bot, chat_id):
+        players = currentTournament.getCurrentMatch().getPlayers()
+        bot.sendMessage(chat_id, 'Матч между @' + players[0] + ' и @' + players[1])
+
+
+def check_tournament_end(bot, chat_id):
     global currentTournament
     if currentTournament.isFinished():
-        update.message.reply_text('Победитель турнира: @' + currentTournament.getWinner())
-        currentTournament = Tournament()
-        currentMatch = None
+        bot.sendMessage(chat_id, 'Победитель турнира: @' + currentTournament.getWinner())
+        reset(bot, chat_id)
     else:
-        update.message.reply_text('Продолжаем турнир')
+        bot.sendMessage(chat_id, 'Продолжаем турнир')
 
 
-def myHelp(bot, update):
+def my_help(bot, update):
     update.message.reply_text('Инструкция:\n'
                               '1) Для участия в турнире необходимо зарегистрироваться. Для этого воспользуйтесь командой /register\n'
                               '2) Турнир начинается командой /start_tournament . Регистрация после этого закрывается.\n'
@@ -146,15 +103,12 @@ if __name__ == "__main__":
 
     # public handlers
     dp.add_handler(CommandHandler('test', test))
-    dp.add_handler(CommandHandler('start_tournament', startTournament))
+    dp.add_handler(CommandHandler('start_tournament', start_tournament))
     dp.add_handler(CommandHandler('register', register))
     dp.add_handler(CommandHandler('participants', participants))
     dp.add_handler(CommandHandler('reset', reset))
-    dp.add_handler(CommandHandler('next_match', nextMatch))
-    dp.add_handler(CommandHandler('i_am_the_winner', iAmTheWinner))
     dp.add_handler(CommandHandler('dice', dice))
-    dp.add_handler(CommandHandler('send_winner', sendWinner, pass_args=True))
-    dp.add_handler(CommandHandler('help', myHelp))
+    dp.add_handler(CommandHandler('help', my_help))
 
     updater.start_polling()
     updater.idle()
