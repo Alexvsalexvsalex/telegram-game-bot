@@ -4,21 +4,37 @@ import random
 class Match(object):
 
     def __init__(self, firstPlayer, secondPlayer):
-        self.first = firstPlayer
-        self.second = secondPlayer
+        self.res = {firstPlayer: None, secondPlayer: None}
         self.winner = None
 
-    def setWinner(self, winner):
-        self.winner = winner
-
-    def getFirstPlayer(self):
-        return self.first
-
-    def getSecondPlayer(self):
-        return self.second
+    def getPlayers(self):
+        return list(self.res.keys())
 
     def getWinner(self):
         return self.winner
+
+    def canBeChanged(self, player):
+        return player in self.res and self.res[player] is None
+
+    def setResult(self, player, res):
+        self.res[player] = res
+        val = None
+        first = None
+        for p in self.res:
+            cur = self.res[p]
+            if cur is None:
+                return None
+            if val is None:
+                val = cur
+                first = p
+                continue
+            if val == cur:
+                return "!"
+            if val < cur:
+                self.winner = p
+            else:
+                self.winner = first
+            return self.winner
 
 
 class Tournament(object):
@@ -27,6 +43,7 @@ class Tournament(object):
         self.heap = [None]
         self.participants = set()
         self.isStartedFlag = False
+        self.currentMatch = None
 
     def register(self, player):
         self.participants.add(player)
@@ -54,13 +71,16 @@ class Tournament(object):
         random.shuffle(partLst)
         for i in range(1, partCnt + 1):
             self.heap[len(self.heap) - i] = partLst[i - 1]
-        print(self.heap)
+        self.generateNextMatch()
+
+    def generateNextMatch(self):
+        self.currentMatch = Match(self.heap.pop(), self.heap.pop())
 
     def getCurrentMatch(self):
-        return Match(self.heap.pop(), self.heap.pop())
-
-    def receiveMatchWinner(self, match):
-        self.heap[(len(self.heap) - 2) // 2 + 1] = match.getWinner()
+        if self.currentMatch.getWinner() is not None:
+            self.heap[(len(self.heap) - 2) // 2 + 1] = self.currentMatch.getWinner()
+            self.generateNextMatch()
+        return self.currentMatch
 
     def isFinished(self):
         if len(self.heap) == 1:
