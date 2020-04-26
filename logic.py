@@ -29,6 +29,8 @@ class Match(object):
                 first = p
                 continue
             if val == cur:
+                for u in self.res:
+                    self.res[u] = None
                 return "!"
             if val < cur:
                 self.winner = p
