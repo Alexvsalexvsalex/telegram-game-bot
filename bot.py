@@ -1,6 +1,7 @@
 from telegram.ext import Updater, CommandHandler
 from logic import Match, Tournament
 import time
+import shelve
 
 
 currentTournament = Tournament()
@@ -27,10 +28,10 @@ def start_tournament(bot, update, args):
     if currentTournament.isStarted():
         update.message.reply_text('Турнир идёт')
     elif currentTournament.canBeStarted():
-        if len(args) == 1 and args[0] == "dart":
-            current_emoji = ":dart"  # Here dart emoji
+        if len(args) == 1 and args[0] == "darts":
+            current_emoji = ":dart:"  # Here dart emoji
         else:
-            current_emoji = ":dice"  # Here dice emoji
+            current_emoji = ":dice:"  # Here dice emoji
         currentTournament.start()
         chat_id = update.message.chat.id
         bot.sendMessage(chat_id, 'Турнир начался')
@@ -52,12 +53,20 @@ def participants(bot, update):
     global currentTournament
     part_list = currentTournament.getParticipants()
     if len(part_list) == 0:
-        update.message.reply_text("Нет зарегистрировашихся")
+        update.message.reply_text("Нет зарегистрировавшихся")
     else:
-        message = "Список зарегистрировашихся: "
+        message = "Список зарегистрировавшихся: "
         for u in part_list:
             message += u + ' '
         update.message.reply_text(message)
+
+
+def stats(bot, update):
+    answer = []
+    with shelve.open('winners') as winners_map:
+        for p in winners_map:
+            answer.append(p + ': ' + winners_map[p])
+    bot.sendMessage(update.message.chat.id, 'Статистика:\n' + '\n'.join(answer))
 
 
 def throw(bot, update):
@@ -88,7 +97,10 @@ def next_match(bot, chat_id):
         players = currentTournament.getCurrentMatch().getPlayers()
         bot.sendMessage(chat_id, 'Матч между @' + players[0] + ' и @' + players[1])
     else:
-        bot.sendMessage(chat_id, 'Победитель турнира: @' + currentTournament.getWinner())
+        winner = currentTournament.getWinner()
+        bot.sendMessage(chat_id, 'Победитель турнира: @' + winner)
+        with shelve.open('winners') as winners_map:
+            winners_map[winner] = winners_map.get(winner, 0) + 1
         hard_reset(bot, chat_id)
 
 
@@ -118,6 +130,7 @@ if __name__ == "__main__":
     dp.add_handler(CommandHandler('register', register))
     dp.add_handler(CommandHandler('participants', participants))
     dp.add_handler(CommandHandler('reset', reset))
+    dp.add_handler(CommandHandler('stats', stats))
     dp.add_handler(CommandHandler('throw', throw))
     dp.add_handler(CommandHandler('help', my_help))
 
