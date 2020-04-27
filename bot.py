@@ -65,7 +65,7 @@ def stats(bot, update):
     answer = []
     with shelve.open('winners') as winners_map:
         for p in winners_map:
-            answer.append(p + ': ' + winners_map[p])
+            answer.append(p + ': ' + str(winners_map[p]))
     bot.sendMessage(update.message.chat.id, 'Статистика:\n' + '\n'.join(answer))
 
 
