@@ -22,8 +22,9 @@ not_your_turn_messages = ['Эм, но вы не участвуете в теку
 not_started_tournament_messages = ['Турнир еще не начался', 'Рано, нет действующих турниров']
 match_notify_messages = ['Матч между', 'Объявляется противостояние ']
 tournament_winner_messages = ['Победитель турнира:', 'Поздравляем, ']
-set_emoji_darts = ['Давайте покидаем дротики', 'Теперь играем в дартс']
-set_emoji_dice = ['С этого момента кидаем кости', 'Готовьте ваши кубики, будемм играть']
+set_emoji_dart = ['Давайте покидаем дротики', 'Теперь играем в дартс']
+set_emoji_dice = ['С этого момента кидаем кости', 'Готовьте ваши кубики, будем играть']
+wrong_arguments = ['Неверные аргументы']
 
 
 def hard_reset(bot, chat_id):
@@ -56,13 +57,17 @@ def start_tournament(bot, update):
 
 def set_emoji(bot, update, args):
     global current_emoji
-    chat_id = update.message.chat.id
-    if len(args) == 1 and args[0] == "darts":
-        current_emoji = "🎯"  # Here dart emoji
-        bot.sendMessage(chat_id, random.choice(set_emoji_darts))
+    if len(args) == 1:
+        if args[0] == "dart":
+            current_emoji = "🎯"  # Here dart emoji
+            update.message.reply_text(random.choice(set_emoji_dart))
+        elif args[0] == "dice":
+            current_emoji = "🎲"  # Here dice emoji
+            update.message.reply_text(random.choice(set_emoji_dice))
+        else:
+            update.message.reply_text(random.choice(wrong_arguments))
     else:
-        current_emoji = "🎲"  # Here dice emoji
-        bot.sendMessage(chat_id, random.choice(set_emoji_dice))
+        update.message.reply_text(random.choice(wrong_arguments))
 
 
 def register(bot, update):
