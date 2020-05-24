@@ -46,9 +46,9 @@ def start_tournament(bot, update, args):
         update.message.reply_text(random.choice(tournament_is_running_messages))
     elif currentTournament.canBeStarted():
         if len(args) == 1 and args[0] == "darts":
-            current_emoji = ":dart:"  # Here dart emoji
+            current_emoji = "🎯"  # Here dart emoji
         else:
-            current_emoji = ":dice:"  # Here dice emoji
+            current_emoji = "🎲"  # Here dice emoji
         currentTournament.start()
         chat_id = update.message.chat.id
         bot.sendMessage(chat_id, random.choice(success_start_tournament_messages))
