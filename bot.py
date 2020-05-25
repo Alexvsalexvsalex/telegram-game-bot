@@ -101,7 +101,7 @@ def stats(bot, update):
         with conn.cursor() as cur:
             cur.execute('SELECT * FROM winners')
             for p in cur:
-                answer.append(p)
+                answer.append(p[0] + ' --- ' + p[1])
     bot.sendMessage(update.message.chat.id, random.choice(statistics_messages) + '\n' + '\n'.join(answer))
 
 
