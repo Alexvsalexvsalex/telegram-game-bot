@@ -3,6 +3,8 @@ from logic import Match, Tournament
 import time
 import shelve
 import random
+import os
+import logging
 
 currentTournament = Tournament()
 current_emoji = ":dice"
@@ -145,13 +147,11 @@ def my_help(bot, update):
         '7) Также можно проверить работоспособность бота командой /test. \n')
 
 
-import logging
-
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 if __name__ == "__main__":
-    updater = Updater('1268400370:AAHHFMgsiN5n3PqUwjUbBRVtC4kNfl5MSTk')
+    updater = Updater(os.environ["TOURNAMENT_BOT_TOKEN"])
     dp = updater.dispatcher
 
     # public handlers
