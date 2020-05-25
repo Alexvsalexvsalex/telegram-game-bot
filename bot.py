@@ -5,7 +5,9 @@ import shelve
 import random
 import os
 import logging
+import psycopg2
 
+DATABASE_URL = os.environ['DATABASE_URL']
 currentTournament = Tournament()
 current_emoji = ":dice"
 
@@ -95,9 +97,11 @@ def participants(bot, update):
 
 def stats(bot, update):
     answer = []
-    with shelve.open('winners') as winners_map:
-        for p in winners_map:
-            answer.append(p + ': ' + str(winners_map[p]))
+    with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
+        with conn.cursor() as cur:
+            cur.execute('SELECT * FROM winners')
+            for p in cur:
+                answer.append(p)
     bot.sendMessage(update.message.chat.id, random.choice(statistics_messages) + '\n' + '\n'.join(answer))
 
 
@@ -131,8 +135,14 @@ def next_match(bot, chat_id):
     else:
         winner = currentTournament.getWinner()
         bot.sendMessage(chat_id, random.choice(tournament_winner_messages) + ' @' + winner)
-        with shelve.open('winners') as winners_map:
-            winners_map[winner] = winners_map.get(winner, 0) + 1
+        with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT count FROM winners WHERE username = %s", (winner, ))
+                rows = cur.fetchall()
+                if len(rows) > 0:
+                    cur.execute("UPDATE winners SET count = count + 1 WHERE username = %s", (winner, ))
+                else:
+                    cur.execute("INSERT INTO winners (username, count) VALUES (%s, %s)", (winner, 1, ))
         hard_reset(bot, chat_id)
 
 
