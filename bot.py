@@ -1,3 +1,4 @@
+import telegram
 from telegram.ext import Updater, CommandHandler
 from logic import Match, Tournament
 import time
@@ -15,7 +16,7 @@ hello_messages = ["Hello, %s", "%s ආයුබෝවන්", "Բարեւ, %s", 
                  "Прывітанне %s", "Привіт %s", "Привет, %s", "Поздрав %s", "سلام به %s", "שלום %s", "Γεια σας %s",
                  "העלא %s", "ہیل%s٪ ے", "Bonjou %s", "Bonjour %s", "Bună ziua %s", "Ciao %s", "Dia duit %s",
                  "Dobrý deň %s", "Dobrý den, %s", "Habari %s", "Halló %s", "Hallo %s", "Halo %s", "Hei %s", "Hej %s",
-                "Helo %s", "Hola %s", "Kaixo %s", "Kamusta %s", "Merhaba %s",
+                 "Helo %s", "Hola %s", "Kaixo %s", "Kamusta %s", "Merhaba %s",
                  "Olá %s", "Ola %s", "Përshëndetje %s", "Pozdrav %s", "Pozdravljeni %s", "Salom %s", "Sawubona %s",
                  "Sveiki %s", "Tere %s", "Witaj %s", "Xin chào %s", "ສະບາຍດີ %s", "สวัสดี %s", "ഹലോ %s", "ಹಲೋ %s",
                  "హలో %s", "हॅलो %s", "नमस्कार%sको", "হ্যালো %s", "ਹੈਲੋ %s", "હેલો %s", "வணக்கம் %s",
@@ -116,14 +117,14 @@ def get_text_stats(stats):
     for p in stats:
         if p[3] != 0:
             prepared_stat.append([p[0], p[1], p[2], p[3], str((p[4] * 10000 // p[3]) / 100) + '%', (p[5] * 100 // p[3]) / 100])
-    return '```' + tabulate(prepared_stat, headers=['NAME', 'T_P', 'T_W', 'M_W', 'W_R', 'AVG'], tablefmt="grid") + '```'
+    return '<pre>' + tabulate(prepared_stat, headers=['NAME', 'T_P', 'T_W', 'N_M', 'W_R', 'AVG']) + '</pre>'
 
 
 def stats(bot, update):
     with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
         with conn.cursor() as cur:
             cur.execute('SELECT * FROM winners')
-            bot.sendMessage(update.message.chat.id, random.choice(statistics_messages) + '\n' + get_text_stats(cur))
+            bot.sendMessage(update.message.chat.id, random.choice(statistics_messages) + '\n' + get_text_stats(cur), parse_mode=telegram.ParseMode.HTML)
 
 
 def throw(bot, update):
