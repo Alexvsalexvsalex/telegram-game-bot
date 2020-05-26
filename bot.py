@@ -148,11 +148,11 @@ def next_match(bot, chat_id):
             with conn.cursor() as cur:
                 for username in stats:
                     cur.execute("INSERT INTO winners (username, tournament_points, tournament_wins, number_matches, number_wins, sum_value) "
-                                "VALUES (%s, %d, %d, %d, %d, %d) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0))
+                                "VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0))
                     user_stats = stats[username]
                     cur.execute("UPDATE winners "
                                 "SET (tournament_points, tournament_wins, number_matches, number_wins, sum_value) ="
-                                " (tournament_points + %d, tournament_wins + %d, number_matches + %d, number_wins + %d, sum_value + %d)"
+                                " (tournament_points + %s, tournament_wins + %s, number_matches + %s, number_wins + %s, sum_value + %s)"
                                 " WHERE username = %s",
                                 (user_stats['tournament_points'], user_stats['tournament_wins'], user_stats['number_matches'], user_stats['number_wins'], user_stats['sum_value']))
         hard_reset(bot, chat_id)
