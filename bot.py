@@ -1,7 +1,7 @@
 from telegram.ext import Updater, CommandHandler
 from logic import Match, Tournament
 import time
-import shelve
+from tabulate import tabulate
 import random
 import os
 import logging
@@ -11,7 +11,15 @@ DATABASE_URL = os.environ['DATABASE_URL']
 currentTournament = Tournament()
 current_emoji = "🎲"
 
-test_messages = ['Проверка связи', 'Ало, ало, как слышно']
+hello_messages = ["Hello, %s", "%s ආයුබෝවන්", "Բարեւ, %s", "مرحبا %s", "Салом %s", "Здраво %s", "Здравейте %s",
+                 "Прывітанне %s", "Привіт %s", "Привет, %s", "Поздрав %s", "سلام به %s", "שלום %s", "Γεια σας %s",
+                 "העלא %s", "ہیل%s٪ ے", "Bonjou %s", "Bonjour %s", "Bună ziua %s", "Ciao %s", "Dia duit %s",
+                 "Dobrý deň %s", "Dobrý den, %s", "Habari %s", "Halló %s", "Hallo %s", "Halo %s", "Hei %s", "Hej %s",
+                 "Hello  %s", "Hello %s", "Hello %s", "Helo %s", "Hola %s", "Kaixo %s", "Kamusta %s", "Merhaba %s",
+                 "Olá %s", "Ola %s", "Përshëndetje %s", "Pozdrav %s", "Pozdravljeni %s", "Salom %s", "Sawubona %s",
+                 "Sveiki %s", "Tere %s", "Witaj %s", "Xin chào %s", "ສະບາຍດີ %s", "สวัสดี %s", "ഹലോ %s", "ಹಲೋ %s",
+                 "హలో %s", "हॅलो %s", "नमस्कार%sको", "হ্যালো %s", "ਹੈਲੋ %s", "હેલો %s", "வணக்கம் %s",
+                 "ကို %s မင်္ဂလာပါ", "გამარჯობა %s", "ជំរាបសួរ %s បាន", "こんにちは%s", "你好%s", "안녕하세요  %s"]
 success_start_tournament_messages = ['Турнир начался', 'Давайте-ка начнем играть']
 tournament_is_running_messages = ['Турнир идёт', 'Существует активный турнир']
 begin_registration_messages = ['Турнир завершен, открывается регистрация на новый', 'Ожидаем желающих посоревноваться']
@@ -31,6 +39,10 @@ set_emoji_dice = ['С этого момента кидаем кости', 'Го�
 set_emoji_basketball = ['Тренер, где кольцо?', 'Я Куроко Тецуя, и это мой басктебол!']
 wrong_arguments = ['Неверные аргументы']
 
+dice_names = ['кости', 'dice', 'dices']
+dart_name = ['дартс', 'dart', 'darts']
+basketball_name = ['баскетбол', 'basketball', 'basket', 'ball']
+
 
 def hard_reset(bot, chat_id):
     global currentTournament
@@ -43,7 +55,7 @@ def reset(bot, update):
 
 
 def test(bot, update):
-    update.message.reply_text(random.choice(test_messages))
+    update.message.reply_text(random.choice(hello_messages) % (update.message.from_user.first_name()))
 
 
 def start_tournament(bot, update):
@@ -63,13 +75,13 @@ def start_tournament(bot, update):
 def set_emoji(bot, update, args):
     global current_emoji
     if len(args) == 1:
-        if args[0] == "dart":
+        if args[0].lower() in dart_name:
             current_emoji = "🎯"  # Here dart emoji
             update.message.reply_text(random.choice(set_emoji_dart))
-        elif args[0] == "dice":
+        elif args[0].lower() in dice_names:
             current_emoji = "🎲"  # Here dice emoji
             update.message.reply_text(random.choice(set_emoji_dice))
-        elif args[0] == "basketball":
+        elif args[0].lower() in basketball_name:
             current_emoji = "🏀"  # Here basketball emoji
             update.message.reply_text(random.choice(set_emoji_basketball))
         else:
@@ -100,10 +112,11 @@ def participants(bot, update):
 
 
 def get_text_stats(stats):
-    answer = []
+    prepared_stat = []
     for p in stats:
-        answer.append(p[0] + ' | ' + str(p[1]) + ' ; ' + str(p[2]) + ' ; ' + str(p[3]) + ' ; ' + str(p[4]) + ' ; ' + str(p[5]))
-    return '\n'.join(answer)
+        if p[2] != 0:
+            prepared_stat.append([p[1], p[2], p[3], (p[4] * 10000 // p[3]) / 100, (p[5] * 100 // p[3]) / 100])
+    return tabulate(stats.items(), headers=['NAME', 'T_P', 'T_W', 'M_W', 'W_R', 'AVG'], tablefmt="grid")
 
 
 def stats(bot, update):
@@ -162,11 +175,17 @@ def my_help(bot, update):
     update.message.reply_text(
         '1) Для участия в турнире необходимо зарегистрироваться. Для этого воспользуйтесь командой /register. \n'
         '2) Можно узнать список участников, вызвав команду /participants. \n'
-        '3) Турнир начинается командой /start_tournament. Регистрация после этого закрывается.\n'
-        '4) Можно указать вид состязания, указав соответствующий эмоджи в команде /set_emoji. По умолчанию это кости. \n'
+        '3) Турнир начинается командой /begin. Регистрация после этого закрывается.\n'
+        '4) Можно указать вид состязания, командой с аргументом /emoji dice|dart|basketball. \n'
         '5) В начале матча будут объявлены игроки. Чтобы сделать ход воспользуйтесь командой /throw. \n'
-        '6) В форс-мажорных ситуациях можно сбросить текущий туринир командой /reset.\n'
-        '7) Также можно проверить работоспособность бота командой /test. \n')
+        '6) В форс-мажорных ситуациях можно сбросить текущий туринир командой /drop.\n'
+        '7) Ознакомьтесь со статистикой игроков командой /stat. \n'
+        'TP = Tournament Points\n'
+        'TW = Tournament Wins\n'
+        'MW = Match Wins\n'
+        'WR = Win Rate\n'
+        'AVG = Average value\n'
+        '8) Также можно поздороваться с ботом командой /greeting. Заодно узнаете не спит ли он. \n')
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -177,14 +196,14 @@ if __name__ == "__main__":
     dp = updater.dispatcher
 
     # public handlers
-    dp.add_handler(CommandHandler('test', test))
-    dp.add_handler(CommandHandler('start_tournament', start_tournament))
+    dp.add_handler(CommandHandler('greeting', test))
+    dp.add_handler(CommandHandler('begin', start_tournament))
     dp.add_handler(CommandHandler('register', register))
     dp.add_handler(CommandHandler('participants', participants))
-    dp.add_handler(CommandHandler('reset', reset))
-    dp.add_handler(CommandHandler('stats', stats))
+    dp.add_handler(CommandHandler('drop', reset))
+    dp.add_handler(CommandHandler('stat', stats))
     dp.add_handler(CommandHandler('throw', throw))
-    dp.add_handler(CommandHandler('set_emoji', set_emoji, pass_args=True))
+    dp.add_handler(CommandHandler('emoji', set_emoji, pass_args=True))
     dp.add_handler(CommandHandler('help', my_help))
 
     updater.start_polling()
