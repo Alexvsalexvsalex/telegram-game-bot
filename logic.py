@@ -4,7 +4,7 @@ import random
 class Statistic(object):
 
     def __init__(self):
-        self.dict_names = ["tournament_points", "number_matches", "number_wins", "sum_value", "tournament_wins"]
+        self.dict_names = ["tournament_points", "tournament_wins", "number_matches", "number_wins", "sum_value"]
         self.data = {}
         for d in self.dict_names:
             self.data[d] = {}
@@ -17,7 +17,7 @@ class Statistic(object):
         self.data["number_wins"][name] = self.data["number_wins"].get(name, 0) + 1
 
     def register_tournament_winner(self, name):
-        self.data["tournament_points"][name] = self.data["number_matches"][name]
+        self.data["tournament_points"][name] = self.data["number_wins"][name]
         self.data["tournament_wins"][name] = 1
 
     def get_full_statistic(self):
