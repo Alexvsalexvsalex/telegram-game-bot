@@ -9,7 +9,7 @@ import psycopg2
 
 DATABASE_URL = os.environ['DATABASE_URL']
 currentTournament = Tournament()
-current_emoji = ":dice"
+current_emoji = "🎲"
 
 test_messages = ['Проверка связи', 'Ало, ало, как слышно']
 success_start_tournament_messages = ['Турнир начался', 'Давайте-ка начнем играть']
