@@ -2,7 +2,7 @@ import telegram
 from telegram.ext import Updater, CommandHandler
 from logic import Match, Tournament
 import time
-from tab import tabulate
+from tabulate import tabulate
 import random
 import os
 import logging
