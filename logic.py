@@ -133,4 +133,8 @@ class Tournament(object):
         return self.heap[0]
 
     def get_stats(self):
-        return self.statistic.get_full_statistic()
+        res = self.statistic.get_full_statistic()
+        for p in res:
+            res[p]["tournament_wins"] = 0
+        res[self.get_winner()]["tournament_wins"] = 1
+        return res
