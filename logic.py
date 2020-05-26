@@ -25,7 +25,7 @@ class Statistic(object):
         for p in players:
             res[p] = {}
             for d in self.dict_names:
-                res[p][d] = self.data[d][p]
+                res[p][d] = self.data[d].get(p, 0)
         return res
 
 
