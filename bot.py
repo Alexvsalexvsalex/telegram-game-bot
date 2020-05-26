@@ -28,6 +28,7 @@ match_notify_messages = ['Матч между', 'Объявляется прот
 tournament_winner_messages = ['Победитель турнира:', 'Поздравляем, ']
 set_emoji_dart = ['Давайте покидаем дротики', 'Теперь играем в дартс']
 set_emoji_dice = ['С этого момента кидаем кости', 'Готовьте ваши кубики, будем играть']
+set_emoji_basketball = ['Тренер, где кольцо?', 'Я Куроко Тецуя, и это мой басктебол!']
 wrong_arguments = ['Неверные аргументы']
 
 
@@ -68,6 +69,9 @@ def set_emoji(bot, update, args):
         elif args[0] == "dice":
             current_emoji = "🎲"  # Here dice emoji
             update.message.reply_text(random.choice(set_emoji_dice))
+        elif args[0] == "basketball":
+            current_emoji = "🏀"  # Here basketball emoji
+            update.message.reply_text(random.choice(set_emoji_basketball))
         else:
             update.message.reply_text(random.choice(wrong_arguments))
     else:
