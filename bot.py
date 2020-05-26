@@ -116,7 +116,7 @@ def get_text_stats(stats):
     for p in stats:
         if p[2] != 0:
             prepared_stat.append([p[1], p[2], p[3], (p[4] * 10000 // p[3]) / 100, (p[5] * 100 // p[3]) / 100])
-    return tabulate(stats.items(), headers=['NAME', 'T_P', 'T_W', 'M_W', 'W_R', 'AVG'], tablefmt="grid")
+    return tabulate(prepared_stat, headers=['NAME', 'T_P', 'T_W', 'M_W', 'W_R', 'AVG'], tablefmt="grid")
 
 
 def stats(bot, update):
