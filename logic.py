@@ -10,14 +10,14 @@ class Statistic(object):
             self.data[d] = {}
 
     def register_throw(self, name, value):
-        self.data["number_matches"][name] += 1
-        self.data["sum_value"][name] += value
+        self.data["number_matches"][name] = self.data["number_matches"].get(name, 0) + 1
+        self.data["sum_value"][name] = self.data["sum_value"].get(name, 0) + value
 
     def register_win(self, name):
-        self.data["number_wins"][name] += 1
+        self.data["number_wins"][name] = self.data["number_wins"].get(name, 0) + 1
 
     def register_tournament_winner(self, name):
-        self.data["tournament_points"][name] += self.data["number_matches"][name]
+        self.data["tournament_points"][name] = self.data["number_matches"][name]
 
     def get_full_statistic(self):
         players = self.data["number_matches"].keys()
@@ -25,7 +25,7 @@ class Statistic(object):
         for p in players:
             res[p] = {}
             for d in self.dict_names:
-                res[p][d] = self.data[d][p]
+                res[p][d] = self.data[d].get(p, 0)
         return res
 
 
@@ -76,8 +76,8 @@ class Tournament(object):
     def __init__(self):
         self.heap = [None]
         self.participants = set()
-        self.isStartedFlag = False
-        self.currentMatch = None
+        self.is_started_flag = False
+        self.current_match = None
         self.statistic = Statistic()
 
     def register(self, player):
@@ -92,10 +92,10 @@ class Tournament(object):
         return False
 
     def is_started(self):
-        return self.isStartedFlag
+        return self.is_started_flag
 
     def start(self):
-        self.isStartedFlag = True
+        self.is_started_flag = True
         leaf = 1
         part_cnt = len(self.participants)
         part_lst = list(self.participants)
@@ -109,21 +109,21 @@ class Tournament(object):
         self.generate_next_match()
 
     def generate_next_match(self):
-        self.currentMatch = Match(self.heap.pop(), self.heap.pop(), self.statistic)
+        self.current_match = Match(self.heap.pop(), self.heap.pop(), self.statistic)
 
     def set_winner_of_last_match(self):
-        self.heap[(len(self.heap) - 2) // 2 + 1] = self.currentMatch.getWinner()
+        self.heap[(len(self.heap) - 2) // 2 + 1] = self.current_match.get_winner()
 
     def get_current_match(self):
-        if self.currentMatch.getWinner() is not None:
+        if self.current_match.get_winner() is not None:
             self.set_winner_of_last_match()
             if not self.is_finished():
                 self.generate_next_match()
-        return self.currentMatch
+        return self.current_match
 
     def is_finished(self):
         if len(self.heap) == 1:
-            if self.currentMatch.getWinner() is not None:
+            if self.current_match.get_winner() is not None:
                 self.set_winner_of_last_match()
                 self.statistic.register_tournament_winner(self.heap[0])
                 return True
