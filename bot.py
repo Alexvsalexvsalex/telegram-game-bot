@@ -102,7 +102,7 @@ def participants(bot, update):
 def get_text_stats(stats):
     answer = []
     for p in stats:
-        answer.append(p['username'] + ' | ' + str(p['tournament_points']) + ' ; ' + str(p['tournament_wins']) + ' ; ' + str(p['number_matches']) + ' ; ' + str(p['number_wins']) + ' ; ' + str(p['sum_value']))
+        answer.append(p[0] + ' | ' + str(p[1]) + ' ; ' + str(p[2]) + ' ; ' + str(p[3]) + ' ; ' + str(p[4]) + ' ; ' + str(p[5]))
     return '\n'.join(answer)
 
 
