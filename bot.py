@@ -49,9 +49,9 @@ def test(bot, update):
 def start_tournament(bot, update):
     global currentTournament
     global current_emoji
-    if currentTournament.isStarted():
+    if currentTournament.is_started():
         update.message.reply_text(random.choice(tournament_is_running_messages))
-    elif currentTournament.canBeStarted():
+    elif currentTournament.can_be_started():
         currentTournament.start()
         chat_id = update.message.chat.id
         bot.sendMessage(chat_id, random.choice(success_start_tournament_messages))
@@ -80,7 +80,7 @@ def set_emoji(bot, update, args):
 
 def register(bot, update):
     global currentTournament
-    if not currentTournament.isStarted():
+    if not currentTournament.is_started():
         currentTournament.register(update.message.from_user.username)
         update.message.reply_text(random.choice(success_registration_messages))
     else:
@@ -89,7 +89,7 @@ def register(bot, update):
 
 def participants(bot, update):
     global currentTournament
-    part_list = currentTournament.getParticipants()
+    part_list = currentTournament.get_participants()
     if len(part_list) == 0:
         update.message.reply_text(random.choice(no_registrations_messages))
     else:
@@ -99,25 +99,29 @@ def participants(bot, update):
         update.message.reply_text(message)
 
 
-def stats(bot, update):
+def get_text_stats(stats):
     answer = []
+    for p in stats:
+        answer.append(p['username'] + ' | ' + str(p['tournament_points']) + ' ; ' + str(p['tournament_wins']) + ' ; ' + str(p['number_matches']) + ' ; ' + str(p['number_wins']) + ' ; ' + str(p['sum_value']))
+    return '\n'.join(answer)
+
+
+def stats(bot, update):
     with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
         with conn.cursor() as cur:
             cur.execute('SELECT * FROM winners')
-            for p in cur:
-                answer.append(p[0] + ' --- ' + str(p[1]))
-    bot.sendMessage(update.message.chat.id, random.choice(statistics_messages) + '\n' + '\n'.join(answer))
+            bot.sendMessage(update.message.chat.id, random.choice(statistics_messages) + '\n' + get_text_stats(cur))
 
 
 def throw(bot, update):
     global currentTournament
     global current_emoji
-    if currentTournament.isStarted():
+    if currentTournament.is_started():
         user = update.message.from_user.username
         chat_id = update.message.chat.id
-        if currentTournament.getCurrentMatch().canBeChanged(user):
+        if currentTournament.get_current_match().can_be_changed(user):
             number_on_dice = update.message.reply_dice(emoji=current_emoji).dice.value
-            result = currentTournament.getCurrentMatch().setResult(user, number_on_dice)
+            result = currentTournament.get_current_match().set_result(user, number_on_dice)
             if result is not None:
                 time.sleep(5)
                 if result == "!":
@@ -133,20 +137,24 @@ def throw(bot, update):
 
 def next_match(bot, chat_id):
     global currentTournament
-    if not currentTournament.isFinished():
-        players = currentTournament.getCurrentMatch().getPlayers()
+    if not currentTournament.is_finished():
+        players = currentTournament.get_current_match().get_players()
         bot.sendMessage(chat_id, random.choice(match_notify_messages) + ' @' + players[0] + ' и @' + players[1])
     else:
-        winner = currentTournament.getWinner()
+        winner = currentTournament.get_winner()
+        stats = currentTournament.get_stats()
         bot.sendMessage(chat_id, random.choice(tournament_winner_messages) + ' @' + winner)
         with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT count FROM winners WHERE username = %s", (winner, ))
-                rows = cur.fetchall()
-                if len(rows) > 0:
-                    cur.execute("UPDATE winners SET count = count + 1 WHERE username = %s", (winner, ))
-                else:
-                    cur.execute("INSERT INTO winners (username, count) VALUES (%s, %s)", (winner, 1, ))
+                for username in stats:
+                    cur.execute("INSERT INTO winners (username, tournament_points, tournament_wins, number_matches, number_wins, sum_value) "
+                                "VALUES (%s, %d, %d, %d, %d, %d) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0))
+                    user_stats = stats[username]
+                    cur.execute("UPDATE winners "
+                                "SET (tournament_points, tournament_wins, number_matches, number_wins, sum_value) ="
+                                " (tournament_points + %d, tournament_wins + %d, number_matches + %d, number_wins + %d, sum_value + %d)"
+                                " WHERE username = %s",
+                                (user_stats['tournament_points'], user_stats['tournament_wins'], user_stats['number_matches'], user_stats['number_wins'], user_stats['sum_value']))
         hard_reset(bot, chat_id)
 
 
