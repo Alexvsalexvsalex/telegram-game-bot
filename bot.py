@@ -113,10 +113,10 @@ def participants(bot, update):
 
 
 def get_text_stats(stats):
-    prepared_stat = [['NAME', 'TP', 'TW', 'NM', 'WR', 'AVG']]
+    prepared_stat = [['NAME', 'TP', 'NM', 'WR', 'AVG']]
     for p in stats:
         if p[3] != 0:
-            prepared_stat.append([p[0], p[1], p[2], p[3], str(p[4] * 100 // p[3]) + '%', p[5] / p[3]])
+            prepared_stat.append([p[0], p[1], p[3], str(p[4] * 100 // p[3]) + '%', p[5] / p[3]])
     return '<pre>' + tabulate(prepared_stat, tablefmt="simple", numalign="left", colalign="left", floatfmt=".1f") + '</pre>'
 
 
