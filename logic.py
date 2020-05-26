@@ -10,14 +10,14 @@ class Statistic(object):
             self.data[d] = {}
 
     def register_throw(self, name, value):
-        self.data["number_matches"][name] += 1
-        self.data["sum_value"][name] += value
+        self.data["number_matches"][name] = self.data["number_matches"].get(name, 0) + 1
+        self.data["sum_value"][name] = self.data["sum_value"].get(name, 0) + value
 
     def register_win(self, name):
-        self.data["number_wins"][name] += 1
+        self.data["number_wins"][name] = self.data["number_wins"].get(name, 0) + 1
 
     def register_tournament_winner(self, name):
-        self.data["tournament_points"][name] += self.data["number_matches"][name]
+        self.data["tournament_points"][name] = self.data["number_matches"][name]
 
     def get_full_statistic(self):
         players = self.data["number_matches"].keys()
