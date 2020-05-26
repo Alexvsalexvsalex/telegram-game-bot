@@ -55,7 +55,7 @@ def reset(bot, update):
 
 
 def test(bot, update):
-    update.message.reply_text(random.choice(hello_messages) % (update.message.from_user.first_name()))
+    update.message.reply_text(random.choice(hello_messages) % (update.message.from_user.first_name))
 
 
 def start_tournament(bot, update):
