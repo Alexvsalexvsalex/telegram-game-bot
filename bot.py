@@ -154,7 +154,7 @@ def next_match(bot, chat_id):
                                 "SET (tournament_points, tournament_wins, number_matches, number_wins, sum_value) ="
                                 " (tournament_points + %s, tournament_wins + %s, number_matches + %s, number_wins + %s, sum_value + %s)"
                                 " WHERE username = %s",
-                                (user_stats['tournament_points'], user_stats['tournament_wins'], user_stats['number_matches'], user_stats['number_wins'], user_stats['sum_value']))
+                                (user_stats['tournament_points'], user_stats['tournament_wins'], user_stats['number_matches'], user_stats['number_wins'], user_stats['sum_value'], username))
         hard_reset(bot, chat_id)
 
 
