@@ -115,15 +115,15 @@ def participants(bot, update):
 
 def get_text_stats(stats):
     # (username, tournament_points, tournament_wins, number_tournaments, number_matches, number_wins, sum_value)
-    prepared_stat1 = [['NAME', 'NM', 'WR', 'AVG']]
-    prepared_stat2 = [['NAME', 'NT', 'WR', 'TP']]
+    prepared_stat1 = [['NAME', 'NM', 'MWR', 'AVG']]
+    prepared_stat2 = [['NAME', 'NT', 'TWR', 'TP']]
     for p in stats:
         if p[4] != 0:
             prepared_stat1.append([p[0], p[4], str(p[5] * 100 // p[4]) + '%', p[6] / p[4]])
         if p[3] != 0:
             prepared_stat2.append([p[0], p[3], str(p[2] * 100 // p[3]) + '%', p[1]])
     return '<pre>' + \
-           tabulate(prepared_stat1, tablefmt="simple", numalign="left", colalign="left",floatfmt=".1f") + \
+           tabulate(prepared_stat1, tablefmt="simple", numalign="left", colalign="left",floatfmt=".1f") + '\n' + \
            tabulate(prepared_stat2, tablefmt="simple", numalign="left", colalign="left", floatfmt=".1f") + '</pre>'
 
 
@@ -194,10 +194,11 @@ def my_help(bot, update):
         '5) В начале матча будут объявлены игроки. Чтобы сделать ход воспользуйтесь командой /throw. \n'
         '6) В форс-мажорных ситуациях можно сбросить текущий туринир командой /drop.\n'
         '7) Ознакомьтесь со статистикой игроков командой /stat. \n'
+        'NT = Number of Tournaments\n'
+        'TWR = Tournament Win Rate\n'
         'TP = Tournament Points\n'
-        'TW = Tournament Wins\n'
-        'NM = Number of matches\n'
-        'WR = Win Rate\n'
+        'NM = Number of Matches\n'
+        'MWR = Match Win Rate\n'
         'AVG = Average value\n'
         '8) Также можно поздороваться с ботом командой /greeting. Заодно узнаете не спит ли он. \n')
 
