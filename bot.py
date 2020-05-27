@@ -14,10 +14,10 @@ current_emoji = "🎲"
 
 hello_messages = ["Hello, %s", "%s ආයුබෝවන්", "Բարեւ, %s", "مرحبا %s", "Салом %s", "Здраво %s", "Здравейте %s",
                   "Прывітанне %s", "Привіт %s", "Привет, %s", "Поздрав %s", "سلام به %s", "שלום %s", "Γεια σας %s",
-                  "העלא %s", "ہیل%s٪ ے", "Bonjou %s", "Bonjour %s", "Bună ziua %s", "Ciao %s", "Dia duit %s",
-                  "Dobrý deň %s", "Dobrý den, %s", "Habari %s", "Halló %s", "Hallo %s", "Halo %s", "Hei %s", "Hej %s",
+                  "העלא %s", "ہیل%s٪ ے", "Bonjour %s", "Bună ziua %s", "Ciao %s", "Dia duit %s",
+                  "Dobrý deň %s", "Dobrý den, %s", "Habari %s", "Halló %s", "Halo %s", "Hei %s", "Hej %s",
                   "Helo %s", "Hola %s", "Kaixo %s", "Kamusta %s", "Merhaba %s",
-                  "Olá %s", "Ola %s", "Përshëndetje %s", "Pozdrav %s", "Pozdravljeni %s", "Salom %s", "Sawubona %s",
+                  "Olá %s", "Përshëndetje %s", "Pozdrav %s", "Pozdravljeni %s", "Sawubona %s",
                   "Sveiki %s", "Tere %s", "Witaj %s", "Xin chào %s", "ສະບາຍດີ %s", "สวัสดี %s", "ഹലോ %s", "ಹಲೋ %s",
                   "హలో %s", "हॅलो %s", "नमस्कार%sको", "হ্যালো %s", "ਹੈਲੋ %s", "હેલો %s", "வணக்கம் %s",
                   "ကို %s မင်္ဂလာပါ", "გამარჯობა %s", "ជំរាបសួរ %s បាន", "こんにちは%s", "你好%s", "안녕하세요  %s"]
@@ -119,7 +119,7 @@ def get_text_stats(stats):
     prepared_stat2 = [['NAME', 'NT', 'TWR', 'TP']]
     for p in stats:
         if p[3] != 0:
-            prepared_stat1.append([p[0], p[3], str(p[4] * 100 // p[3]) + '%', p[5] / p[3]])
+            prepared_stat1.append([p[0], p[3], str(p[4] * 100 // p[3]) + '%', p[5] * 10 // p[3] / 10])
         if p[6] != 0:
             prepared_stat2.append([p[0], p[6], str(p[2] * 100 // p[6]) + '%', p[1]])
     return '<pre>' + \
