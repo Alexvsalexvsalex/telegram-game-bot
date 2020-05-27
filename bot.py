@@ -175,7 +175,7 @@ def next_match(bot, chat_id):
                         "VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0, 0))
                     user_stats = stats[username]
                     cur.execute("UPDATE winners "
-                                "SET (tournament_points, tournament_wins, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) ="
+                                "SET (tournament_points, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) ="
                                 " (tournament_points + %s, tournament_wins + %s, number_tournaments + %s, number_matches + %s, number_wins + %s, sum_value + %s)"
                                 " WHERE username = %s",
                                 (user_stats['tournament_points'], user_stats['tournament_wins'],
