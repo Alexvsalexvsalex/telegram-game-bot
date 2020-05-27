@@ -2,6 +2,7 @@ import telegram
 from telegram.ext import Updater, CommandHandler
 from logic import Match, Tournament
 import time
+from operator import itemgetter
 from tabulate import tabulate
 import random
 import os
@@ -115,13 +116,17 @@ def participants(bot, update):
 
 def get_text_stats(stats):
     # (username, tournament_points, tournament_wins, number_matches, number_wins, sum_value, number_tournaments)
-    prepared_stat1 = [['NAME', 'NM', 'MWR', 'AVG']]
-    prepared_stat2 = [['NAME', 'NT', 'TWR', 'TP']]
+    prepared_stat1 = []
+    prepared_stat2 = []
     for p in stats:
         if p[3] != 0:
             prepared_stat1.append([p[0], p[3], str(p[4] * 100 // p[3]) + '%', p[5] * 10 // p[3] / 10])
         if p[6] != 0:
             prepared_stat2.append([p[0], p[6], str(p[2] * 100 // p[6]) + '%', p[1]])
+    sorted(prepared_stat1, key=lambda x: x[1] * x[2])
+    sorted(prepared_stat2, key=lambda x: x[3])
+    prepared_stat1.insert(0, ['NAME', 'NM', 'MWR', 'AVG'])
+    prepared_stat2.insert(0, ['NAME', 'NT', 'TWR', 'TP'])
     return '<pre>' + \
            tabulate(prepared_stat1, tablefmt="simple", numalign="left", colalign="left",floatfmt=".1f") + '\n' + \
            tabulate(prepared_stat2, tablefmt="simple", numalign="left", colalign="left", floatfmt=".1f") + '</pre>'
