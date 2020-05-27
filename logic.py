@@ -4,10 +4,13 @@ import random
 class Statistic(object):
 
     def __init__(self):
-        self.dict_names = ["tournament_points", "tournament_wins", "number_matches", "number_wins", "sum_value"]
+        self.dict_names = ["tournament_points", "tournament_wins", "number_tournaments", "number_matches", "number_wins", "sum_value"]
         self.data = {}
         for d in self.dict_names:
             self.data[d] = {}
+
+    def register_participant(self, name):
+        self.data["number_tournaments"][name] = 1
 
     def register_throw(self, name, value):
         self.data["number_matches"][name] = self.data["number_matches"].get(name, 0) + 1
@@ -100,6 +103,8 @@ class Tournament(object):
         leaf = 1
         part_cnt = len(self.participants)
         part_lst = list(self.participants)
+        for p in part_lst:
+            self.statistic.register_participant(p)
         while leaf < part_cnt:
             self.heap.append(None)
             self.heap.append(None)
