@@ -114,18 +114,24 @@ def participants(bot, update):
 
 
 def get_text_stats(stats):
-    prepared_stat = [['NAME', 'TP', 'TW', 'NM', 'WR', 'AVG']]
+    # (username, tournament_points, tournament_wins, number_tournaments, number_matches, number_wins, sum_value)
+    prepared_stat1 = [['NAME', 'NM', 'WR', 'AVG']]
+    prepared_stat2 = [['NAME', 'NT', 'WR', 'TP']]
     for p in stats:
+        if p[4] != 0:
+            prepared_stat1.append([p[0], p[4], str(p[5] * 100 // p[4]) + '%', p[6] / p[4]])
         if p[3] != 0:
-            prepared_stat.append([p[0], p[1], p[2], p[3], str(p[4] * 100 // p[3]) + '%', p[5] / p[3]])
-    return '<pre>' + tabulate(prepared_stat, tablefmt="simple", numalign="left", colalign="left",
-                              floatfmt=".1f") + '</pre>'
+            prepared_stat2.append([p[0], p[3], str(p[2] * 100 // p[3]) + '%', p[1]])
+    return '<pre>' + \
+           tabulate(prepared_stat1, tablefmt="simple", numalign="left", colalign="left",floatfmt=".1f") + \
+           tabulate(prepared_stat2, tablefmt="simple", numalign="left", colalign="left", floatfmt=".1f") + '</pre>'
 
 
 def stats(bot, update):
     with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
         with conn.cursor() as cur:
-            cur.execute('SELECT * FROM winners')
+            cur.execute(
+                'SELECT (username, tournament_points, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) FROM winners')
             bot.sendMessage(update.message.chat.id, random.choice(statistics_messages) + '\n' + get_text_stats(cur),
                             parse_mode=telegram.ParseMode.HTML)
 
@@ -165,14 +171,15 @@ def next_match(bot, chat_id):
             with conn.cursor() as cur:
                 for username in stats:
                     cur.execute(
-                        "INSERT INTO winners (username, tournament_points, tournament_wins, number_matches, number_wins, sum_value) "
-                        "VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0))
+                        "INSERT INTO winners (username, tournament_points, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) "
+                        "VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0, 0))
                     user_stats = stats[username]
                     cur.execute("UPDATE winners "
-                                "SET (tournament_points, tournament_wins, number_matches, number_wins, sum_value) ="
-                                " (tournament_points + %s, tournament_wins + %s, number_matches + %s, number_wins + %s, sum_value + %s)"
+                                "SET (tournament_points, tournament_wins, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) ="
+                                " (tournament_points + %s, tournament_wins + %s, number_tournaments + %s, number_matches + %s, number_wins + %s, sum_value + %s)"
                                 " WHERE username = %s",
                                 (user_stats['tournament_points'], user_stats['tournament_wins'],
+                                 user_stats['number_tournaments'],
                                  user_stats['number_matches'], user_stats['number_wins'], user_stats['sum_value'],
                                  username))
         hard_reset(bot, chat_id)
