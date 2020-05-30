@@ -48,7 +48,7 @@ time_for_turn_seconds = 60
 dice_names = ['кости', 'кубики', 'кубик', 'dice', 'dices']
 dart_names = ['дартс', 'dart', 'darts']
 basketball_names = ['баскетбол', 'basketball', 'basket', 'ball']
-
+coin_like_emoji = ["🏀"]
 
 def hard_reset(bot, chat_id):
     global currentTournament
@@ -85,7 +85,7 @@ def start_tournament(bot, update):
 def set_emoji(bot, update, args):
     global current_emoji
     if len(args) == 0:
-        set_emoji(bot, update, random.choice(random.choice([dice_names, dart_names, basketball_names])))
+        set_emoji(bot, update, random.choice([dice_names, dart_names, basketball_names])[0])
     elif len(args) == 1:
         arg = args[0].lower()
         if arg in dart_names:
@@ -163,10 +163,11 @@ def throw(bot, update):
         chat_id = update.message.chat.id
         if currentTournament.get_current_match().can_be_changed(user):
             number_on_dice = update.message.reply_dice(emoji=current_emoji).dice.value
-            if number_on_dice >= 4:
-                number_on_dice = 6
-            else:
-                number_on_dice = 1
+            if current_emoji in coin_like_emoji:
+                if number_on_dice >= 4:
+                    number_on_dice = 5
+                else:
+                    number_on_dice = 2
             result = currentTournament.get_current_match().set_result(user, number_on_dice)
             if result is not None:
                 time.sleep(5)
@@ -203,7 +204,7 @@ def next_match(bot, chat_id):
             with conn.cursor() as cur:
                 for username in stats:
                     cur.execute(
-                        "INSERT INTO winners (username, tournament_points, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) "
+                        "INSERT INTO winners (username, tournament_pointis, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) "
                         "VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0, 0))
                     user_stats = stats[username]
                     cur.execute("UPDATE winners "
