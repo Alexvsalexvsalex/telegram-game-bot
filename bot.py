@@ -50,9 +50,11 @@ dart_names = ['дартс', 'dart', 'darts']
 basketball_names = ['баскетбол', 'basketball', 'basket', 'ball']
 coin_like_emoji = ["🏀"]
 
+
 def hard_reset(bot, chat_id):
     global currentTournament
     currentTournament = Tournament()
+    clear_match_deadline()
     bot.sendMessage(chat_id, random.choice(begin_registration_messages))
 
 
@@ -176,7 +178,7 @@ def throw(bot, update):
                     bot.sendMessage(chat_id, random.choice(draw_messages) % (
                         currentTournament.get_current_match().get_players()))
                 else:
-                    bot.sendMessage(chat_id, random.choice(match_winner_messages) % (result))
+                    bot.sendMessage(chat_id, random.choice(match_winner_messages) % result)
                     next_match(bot, chat_id)
         else:
             update.message.reply_text(random.choice(not_your_turn_messages))
@@ -189,6 +191,11 @@ def refresh_match_deadline():
     match_deadline = time.time() + time_for_turn_seconds
 
 
+def clear_match_deadline():
+    global match_deadline
+    match_deadline = 0
+
+
 def next_match(bot, chat_id):
     global currentTournament
     global match_deadline
@@ -199,7 +206,7 @@ def next_match(bot, chat_id):
     else:
         winner = currentTournament.get_winner()
         stats = currentTournament.get_stats()
-        bot.sendMessage(chat_id, random.choice(tournament_winner_messages) + ' @' + winner)
+        bot.sendMessage(chat_id, random.choice(tournament_winner_messages) % winner)
         with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
             with conn.cursor() as cur:
                 for username in stats:
