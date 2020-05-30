@@ -22,7 +22,7 @@ hello_messages = ["Hello, %s", "%s ආයුබෝවන්", "Բարեւ, %s", 
                   "Sveiki %s", "Tere %s", "Witaj %s", "Xin chào %s", "ສະບາຍດີ %s", "สวัสดี %s", "ഹലോ %s", "ಹಲೋ %s",
                   "హలో %s", "हॅलो %s", "नमस्कार%sको", "হ্যালো %s", "ਹੈਲੋ %s", "હેલો %s", "வணக்கம் %s"]
 success_start_tournament_messages = ['Турнир начался', 'Давайте-ка начнем играть']
-tournament_is_running_messages = ['Турнир идёт', 'Существует активный турнир', 'Турнир уже начался']
+tournament_is_running_messages = ['Идёт турнир', 'Существует активный турнир', 'Турнир уже начался']
 begin_registration_messages = ['Турнир завершен, открывается регистрация на новый', 'Ожидаем желающих посоревноваться']
 success_registration_messages = ['Успешная регистрация на турнир', 'Проходите, присаживайтесь']
 already_registered_messages = ['Вы уже в турнире, зачем обманывать?', 'Не нужно регистрироваться несколько раз']
@@ -86,23 +86,27 @@ def start_tournament(bot, update):
 
 def set_emoji(bot, update, args):
     global current_emoji
-    if len(args) == 0:
-        set_emoji(bot, update, random.choice([dice_names, dart_names, basketball_names])[0])
-    elif len(args) == 1:
-        arg = args[0].lower()
-        if arg in dart_names:
-            current_emoji = "🎯"  # Here dart emoji
-            update.message.reply_text(random.choice(set_emoji_dart))
-        elif arg in dice_names:
-            current_emoji = "🎲"  # Here dice emoji
-            update.message.reply_text(random.choice(set_emoji_dice))
-        elif arg in basketball_names:
-            current_emoji = "🏀"  # Here basketball emoji
-            update.message.reply_text(random.choice(set_emoji_basketball))
+    global currentTournament
+    if currentTournament.is_started():
+        update.message.reply_text(random.choice(tournament_is_running_messages))
+    else:
+        if len(args) == 0:
+            set_emoji(bot, update, [random.choice([dice_names, dart_names, basketball_names])[0]])
+        elif len(args) == 1:
+            arg = args[0].lower()
+            if arg in dart_names:
+                current_emoji = "🎯"  # Here dart emoji
+                update.message.reply_text(random.choice(set_emoji_dart))
+            elif arg in dice_names:
+                current_emoji = "🎲"  # Here dice emoji
+                update.message.reply_text(random.choice(set_emoji_dice))
+            elif arg in basketball_names:
+                current_emoji = "🏀"  # Here basketball emoji
+                update.message.reply_text(random.choice(set_emoji_basketball))
+            else:
+                update.message.reply_text(random.choice(wrong_arguments))
         else:
             update.message.reply_text(random.choice(wrong_arguments))
-    else:
-        update.message.reply_text(random.choice(wrong_arguments))
 
 
 def register(bot, update):
