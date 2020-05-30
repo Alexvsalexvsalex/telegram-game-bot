@@ -87,6 +87,9 @@ class Tournament(object):
     def register(self, player):
         self.participants.add(player)
 
+    def is_registered(self, player):
+        return player in self.participants
+
     def get_participants(self):
         return list(self.participants)
 
