@@ -180,7 +180,7 @@ def throw(bot, update):
                 if result == "!":
                     refresh_match_deadline()
                     bot.sendMessage(chat_id, random.choice(draw_messages) %
-                                    tuple(currentTournament.get_current_match().get_players()))
+                                    add_ping_to_users(currentTournament.get_current_match().get_players()))
                 else:
                     bot.sendMessage(chat_id, random.choice(match_winner_messages) % result)
                     next_match(bot, chat_id)
@@ -202,15 +202,14 @@ def clear_match_deadline():
 
 def next_match(bot, chat_id):
     global currentTournament
-    global match_deadline
     if not currentTournament.is_finished():
-        players = currentTournament.get_current_match().get_players()
         refresh_match_deadline()
-        bot.sendMessage(chat_id, random.choice(match_notify_messages) % ('@' + players[0], '@' + players[1]))
+        bot.sendMessage(chat_id, random.choice(match_notify_messages) % add_ping_to_users(
+            currentTournament.get_current_match().get_players()))
     else:
         winner = currentTournament.get_winner()
         stats = currentTournament.get_stats()
-        bot.sendMessage(chat_id, random.choice(tournament_winner_messages) % winner)
+        bot.sendMessage(chat_id, random.choice(tournament_winner_messages) % add_ping_to_users([winner]))
         with psycopg2.connect(DATABASE_URL, sslmode='require') as conn:
             with conn.cursor() as cur:
                 for username in stats:
@@ -227,6 +226,10 @@ def next_match(bot, chat_id):
                                  user_stats['number_matches'], user_stats['number_wins'], user_stats['sum_value'],
                                  username))
         hard_reset(bot, chat_id)
+
+
+def add_ping_to_users(users):
+    return tuple(map(lambda x: '@' + x, users))
 
 
 def my_help(bot, update):
