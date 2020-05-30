@@ -175,8 +175,8 @@ def throw(bot, update):
                 time.sleep(5)
                 if result == "!":
                     refresh_match_deadline()
-                    bot.sendMessage(chat_id, random.choice(draw_messages) % (
-                        currentTournament.get_current_match().get_players()))
+                    bot.sendMessage(chat_id, random.choice(draw_messages) %
+                                    tuple(currentTournament.get_current_match().get_players()))
                 else:
                     bot.sendMessage(chat_id, random.choice(match_winner_messages) % result)
                     next_match(bot, chat_id)
