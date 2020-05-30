@@ -211,7 +211,7 @@ def next_match(bot, chat_id):
             with conn.cursor() as cur:
                 for username in stats:
                     cur.execute(
-                        "INSERT INTO winners (username, tournament_pointis, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) "
+                        "INSERT INTO winners (username, tournament_points, tournament_wins, number_tournaments, number_matches, number_wins, sum_value) "
                         "VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING", (username, 0, 0, 0, 0, 0, 0))
                     user_stats = stats[username]
                     cur.execute("UPDATE winners "
