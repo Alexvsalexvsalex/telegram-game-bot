@@ -9,19 +9,28 @@ class Statistic(object):
         for d in self.dict_names:
             self.data[d] = {}
 
+    def safe_add(self, key, name, value):
+        self.data[key][name] = self.data[key].get(name, 0) + value
+
     def register_participant(self, name):
         self.data["number_tournaments"][name] = 1
 
     def register_throw(self, name, value):
-        self.data["number_matches"][name] = self.data["number_matches"].get(name, 0) + 1
-        self.data["sum_value"][name] = self.data["sum_value"].get(name, 0) + value
+        self.safe_add("number_matches", name, 1)
+        self.safe_add("sum_value", name, value)
 
     def register_win(self, name):
-        self.data["number_wins"][name] = self.data["number_wins"].get(name, 0) + 1
+        self.safe_add("number_wins", name, 1)
+        self.safe_add("tournament_points", name, 1)
+
+    def register_draw(self, name1, name2):
+        self.safe_add("number_wins", name1, 0.5)
+        self.safe_add("number_wins", name2, 0.5)
 
     def register_tournament_winner(self, name):
-        self.data["tournament_points"][name] = self.data["number_wins"][name]
         self.data["tournament_wins"][name] = 1
+        pts = self.data["tournament_points"][name]
+        self.data["tournament_points"] = {name: pts}
 
     def get_full_statistic(self):
         players = self.data["number_matches"].keys()
@@ -65,6 +74,7 @@ class Match(object):
             if val == cur:
                 for u in self.res:
                     self.res[u] = None
+                self.statistic.register_draw(first, p)
                 return "!"
             if val < cur:
                 self.winner = p
