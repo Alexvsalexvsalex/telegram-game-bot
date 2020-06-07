@@ -138,7 +138,7 @@ def get_text_stats(stats):
     prepared_stat2 = []
     for p in stats:
         if p[3] != 0:
-            prepared_stat1.append([p[0], p[3], str(p[4] * 100 // p[3]) + '%', p[5] * 10 // p[3] / 10, p[4]])
+            prepared_stat1.append([p[0], p[3] // 2, str(p[4] * 100 // p[3]) + '%', p[5] * 10 // p[3] / 10, p[4]])
         if p[6] != 0:
             prepared_stat2.append([p[0], p[6], str(p[2] * 100 // p[6]) + '%', p[1]])
     prepared_stat1.sort(key=lambda x: -x[4])
