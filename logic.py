@@ -16,16 +16,16 @@ class Statistic(object):
         self.data["number_tournaments"][name] = 1
 
     def register_throw(self, name, value):
-        self.safe_add("number_matches", name, 1)
+        self.safe_add("number_matches", name, 2)
         self.safe_add("sum_value", name, value)
 
     def register_win(self, name):
-        self.safe_add("number_wins", name, 1)
+        self.safe_add("number_wins", name, 2)
         self.safe_add("tournament_points", name, 1)
 
     def register_draw(self, name1, name2):
-        self.safe_add("number_wins", name1, 0.5)
-        self.safe_add("number_wins", name2, 0.5)
+        self.safe_add("number_wins", name1, 1)
+        self.safe_add("number_wins", name2, 1)
 
     def register_tournament_winner(self, name):
         self.data["tournament_wins"][name] = 1
