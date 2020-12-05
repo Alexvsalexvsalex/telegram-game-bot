@@ -110,7 +110,7 @@ def set_emoji(bot, update, args):
                 update.message.reply_text(random.choice(set_emoji_basketball))
             elif arg in football_names:
                 current_emoji = "⚽"  # Here football emoji
-                update.message.reply_text(random.choice(set_emoji_basketball))
+                update.message.reply_text(random.choice(set_emoji_football))
             else:
                 update.message.reply_text(random.choice(wrong_arguments))
         else:
